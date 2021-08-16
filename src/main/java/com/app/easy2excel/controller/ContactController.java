@@ -2,19 +2,17 @@ package com.app.easy2excel.controller;
 
 import java.util.List;
 
+import com.app.easy2excel.exception.EmailNotFoundException;
+import com.app.easy2excel.exception.ErrorResponse;
+import com.app.easy2excel.exception.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import com.app.easy2excel.entity.Contact;
 import com.app.easy2excel.service.ContactService;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/contact")
@@ -24,8 +22,10 @@ public class ContactController {
 	ContactService contactService;
 
 	@PostMapping("/")
-	public ResponseEntity<Contact> saveContact(@RequestBody Contact contact) {
-
+	public ResponseEntity<Contact> saveContact(@Valid  @RequestBody Contact contact) {
+		if( null==contact.getEmail()){
+		throw new EmailNotFoundException("email id not present");
+		}
 		return ResponseEntity.ok(contactService.saveContact(contact));
 
 	}
@@ -57,4 +57,11 @@ public class ContactController {
 		contactService.deleteContactById(id);
 
 	}
+
+
+	/*@ExceptionHandler(RecordNotFoundException.class)
+	public ResponseEntity<ErrorResponse> emailNotFoundException(RecordNotFoundException exception){
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(),System.currentTimeMillis(), HttpStatus.NOT_FOUND.value());
+		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
+	}*/
 }

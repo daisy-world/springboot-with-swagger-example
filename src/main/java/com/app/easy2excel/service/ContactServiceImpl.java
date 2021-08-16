@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.app.easy2excel.entity.Contact;
 import com.app.easy2excel.repository.ContactRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
@@ -36,9 +38,8 @@ public class ContactServiceImpl implements ContactService {
 	public Contact getContactDetailsById(Long id) {
 		log.debug("inside fetch contact by id method..");
 
-		Optional<Contact> contact = contactRepository.findById(id);
-		
-		return contact.get();
+		return contactRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found for id " + id));
+
 	}
 
 	@Override
